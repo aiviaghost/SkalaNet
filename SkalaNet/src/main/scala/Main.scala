@@ -17,7 +17,7 @@ val menuOptions = Seq(
 )
 
 def getUserChoice(): Option[Int] = 
-    println(menuOptions.zipWithIndex.map((s, i) => s"${i + 1}. ${s._1}").mkString("\n"))
+    println(menuOptions.zipWithIndex.map((p, i) => s"${i + 1}. ${p._1}").mkString("\n"))
     io.StdIn.readLine("Your choice: ").toIntOption
 
 @main def start(): Unit = 
