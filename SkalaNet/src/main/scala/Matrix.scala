@@ -1,7 +1,7 @@
 package SkalaNet
 
 case class Matrix private (private val M: Array[Array[Float]]):
-    import scalanative.unsafe.*, Nat.*    
+    import scalanative.unsafe.*   
     
     private val (rows, cols) = (M.size, M(0).size)
     
@@ -26,8 +26,8 @@ case class Matrix private (private val M: Array[Array[Float]]):
         for i <- 0 until m do
             for j <- 0 until p do
                 !(B + i * p + j) = other.M(i)(j)
-        val res = stackalloc[CFloat](n * p)
         
+        val res = stackalloc[CFloat](n * p)
         mult(n, m, p, A, B, res)
         
         val newM = Array.fill(n)(Array.ofDim[Float](p))
