@@ -1,6 +1,6 @@
 package SkalaNet
 
-case class Matrix (private val M: Array[Array[Float]]):
+case class Matrix private (private val M: Array[Array[Float]]):
     import scalanative.unsafe.*   
     
     private val (rows, cols) = (M.size, M(0).size)
