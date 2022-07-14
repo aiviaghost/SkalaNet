@@ -1,3 +1,5 @@
+package SkalaNet
+
 def testNetwork() = ???
 
 def trainNetwork() = ???
