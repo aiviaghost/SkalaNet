@@ -3,7 +3,7 @@ package SkalaNet
 case class Matrix private (private val M: Array[Array[Float]]):
     import scalanative.unsafe.*   
     
-    private val (rows, cols) = (M.size, M(0).size)
+    val (rows, cols) = (M.size, M(0).size)
     
     @extern
     private def mult(
@@ -46,6 +46,9 @@ case class Matrix private (private val M: Array[Array[Float]]):
                 newM(i)(j) = !(res + i * p + j)
         
         Matrix(newM)
+    
+    def map(f: Float => Float): Matrix = 
+        Matrix(M.map(_.map(f)))
 
     override def toString(): String = M.map(_.mkString(", ")).mkString("\n")
 
