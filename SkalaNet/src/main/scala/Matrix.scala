@@ -3,7 +3,7 @@ package SkalaNet
 case class Matrix private (private val M: Array[Array[Float]]):
     import scalanative.unsafe.*   
     
-    private val (rows, cols) = (M.size, M(0).size)
+    val (rows, cols) = (M.size, M(0).size)
     
     @extern
     private def mult(
