@@ -1,6 +1,6 @@
 package SkalaNet
 
-case class Image private (private val pixels: Array[Array[Int]]):
+case class Image private (val label: Int, private val pixels: Array[Array[Int]]):
     def toColumnVector(): Matrix = ???
 
     override def toString(): String = 
@@ -12,11 +12,19 @@ case class Image private (private val pixels: Array[Array[Int]]):
         Seq(bar, digit, bar).mkString("\n")
 
 object Image:
-    def readImages(file: String): Seq[Image] = 
+
+    private def readBytes(file: String) = 
         import java.nio.file.{Files, Paths}
         Files.readAllBytes(Paths.get(file))
-             .drop(16)
-             .map(_.toInt & 255) // convert to unsigned "byte" by masking with 0b11111111
-             .grouped(28 * 28)
-             .map(chunk => Image(chunk.grouped(28).toArray))
-             .toSeq
+
+    private def readLabels(labelFile: String): Seq[Int] = readBytes(labelFile).drop(8).map(_.toInt)
+
+    def readImages(imageFile: String, labelFile: String): Seq[Image] = 
+        val labels = readLabels(labelFile)
+        readBytes(imageFile).drop(16)
+                            .map(_.toInt & 255) // convert to unsigned "byte" by masking with 0b11111111
+                            .grouped(28 * 28)
+                            .map(_.grouped(28).toArray)
+                            .zip(labels)
+                            .map(p => Image(p._2, p._1))
+                            .toSeq
