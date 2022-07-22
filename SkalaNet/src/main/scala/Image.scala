@@ -26,5 +26,5 @@ object Image:
                             .grouped(28 * 28)
                             .map(_.grouped(28).toArray)
                             .zip(labels)
-                            .map(p => Image(p._2, p._1))
+                            .map(p => Image(pixels = p._1, label = p._2))
                             .toSeq
