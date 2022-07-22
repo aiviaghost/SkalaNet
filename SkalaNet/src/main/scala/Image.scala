@@ -5,9 +5,9 @@ case class Image private (private val pixels: Array[Array[Int]]):
 
     override def toString(): String = 
         import math.floorDiv
-        val byte2ascii = """$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,"^`'. """
+        val byte2ascii = """ .'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"""
         val LEN = byte2ascii.length
-        val digit = pixels.map("|" + _.map(pixel => byte2ascii(LEN - 1 - floorDiv(pixel * LEN, 256))).mkString + "|").mkString("\n")
+        val digit = pixels.map("|" + _.map(pixel => byte2ascii(floorDiv(pixel * LEN, 256))).mkString + "|").mkString("\n")
         val bar = "+" + "-".padTo(28, "-").mkString + "+" // "-".repeat(28) is not supported by Scala Native :(
         Seq(bar, digit, bar).mkString("\n")
 
