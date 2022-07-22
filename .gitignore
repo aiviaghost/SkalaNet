@@ -51,3 +51,6 @@ hs_err_pid*
 
 # Ignore code-workspaces
 *.code-workspace
+
+# MNIST database
+MNIST/

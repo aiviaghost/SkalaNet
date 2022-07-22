@@ -1,5 +1,8 @@
 package SkalaNet
 
+lazy val training_images = Image.readImages("../MNIST/training_set/train-images-idx3-ubyte")
+lazy val test_images = Image.readImages("../MNIST/test_set/t10k-images-idx3-ubyte")
+
 def testNetwork() = ???
 
 def trainNetwork() = ???
