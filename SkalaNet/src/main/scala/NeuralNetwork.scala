@@ -8,4 +8,5 @@ case class NeuralNetwork (private val layers: Int*):
     // ReLU ;)
     private def __/(x: Matrix): Matrix = x.map(math.max(_, 0))
 
-    private def feedforward(inp: Matrix): Matrix = weights.zip(biases).foldLeft(inp){case (x, (w, b)) => __/(w * x + b)}
+    private def feedforward(inp: Matrix): Matrix = 
+        weights.zip(biases).foldLeft(inp){case (x, (w, b)) => __/(w * x + b)}
