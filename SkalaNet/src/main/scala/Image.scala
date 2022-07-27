@@ -20,7 +20,7 @@ object Image:
     def readImages(imageFile: String, labelFile: String): Seq[Image] = 
         val labels = readLabels(labelFile)
         readBytes(imageFile).drop(16)
-                            .map(_.toInt & 255) // convert to unsigned "byte" by masking with 0b11111111
+                            .map(_.toInt & 255) // convert to unsigned "byte" by masking with 0b11111111, https://github.com/scala-native/scala-native/pull/2711
                             .grouped(28 * 28)
                             .map(_.grouped(28).toArray)
                             .zip(labels)
