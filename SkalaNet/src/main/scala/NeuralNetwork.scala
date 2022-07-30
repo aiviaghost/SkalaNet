@@ -1,7 +1,7 @@
 package SkalaNet
 
 case class NeuralNetwork (private val layers: Int*):
-    private val dimensions = layers.zip(layers.tail)
+    private val dimensions = layers.tail.zip(layers)
     private val weights = dimensions.map((n, m) => Matrix.fillRandom(n, m))
     private val biases = dimensions.map((n, _) => Matrix.fillRandom(n, 1))
 
@@ -10,3 +10,7 @@ case class NeuralNetwork (private val layers: Int*):
 
     private def feedforward(inp: Matrix): Matrix = 
         weights.zip(biases).foldLeft(inp){case (x, (w, b)) => __/(w * x + b)}
+
+    // query the network using a matrix representing the image
+    def apply(inp: Matrix): Int = 
+        feedforward(inp).getM().flatten.zipWithIndex.max._2 + 1

@@ -49,6 +49,9 @@ case class Matrix (private val M: Array[Array[Float]]):
     
     def map(f: Float => Float): Matrix = 
         Matrix(M.map(_.map(f)))
+    
+    def getM(): Array[Array[Float]] = 
+        M.map(_.clone()).clone()
 
     override def toString(): String = M.map(_.mkString(", ")).mkString("\n")
 
