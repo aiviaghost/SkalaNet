@@ -17,9 +17,10 @@ def testNetwork() =
     while images.hasNext && continue do
         val image = images.next()
         println(image)
-        println(s"SkalaNet thinks this is the number ${nn(image.toColumnVector())}")
+        println(s"SkalaNet thinks this is the digit ${nn(image.toColumnVector())}.")
+        println(s"The correct answer is ${image.label}.")
         println("Try another image? (y/n)")
-        continue = io.StdIn.readLine("Your choice: ").equals(("y"))
+        continue = io.StdIn.readLine("Your choice: ") == "y"
 
 def trainNetwork() = ???
 
