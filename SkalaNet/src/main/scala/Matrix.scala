@@ -1,16 +1,20 @@
 package SkalaNet
 
-case class Matrix (private val M: Array[Array[Float]]):
-    import scalanative.unsafe.*   
-    
-    val (rows, cols) = (M.size, M(0).size)
-    
-    @extern
-    private def mult(
-        n: CInt, m: CInt, p: CInt, 
-        A: Ptr[CFloat], B: Ptr[CFloat], 
-        res: Ptr[CFloat]
-    ): Unit = extern
+import SkalaNet.Types.*
+import scalanative.unsafe.*
+
+@extern
+def mult(
+    n: CInt, m: CInt, p: CInt, 
+    A: Ptr[CFloat], B: Ptr[CFloat], 
+    res: Ptr[CFloat]
+): Unit = extern
+
+extension (M: Matrix)
+
+    def rows: Int = M.size
+
+    def cols: Int = M(0).size
 
     def +(other: Matrix): Matrix = 
         assert(rows == other.rows && cols == other.cols, "Matrix dimensions do not match!")
@@ -18,9 +22,9 @@ case class Matrix (private val M: Array[Array[Float]]):
         val newM = Array.fill(rows)(Array.ofDim[Float](cols))
         for i <- 0 until rows do 
             for j <- 0 until cols do
-                newM(i)(j) = M(i)(j) + other.M(i)(j)
+                newM(i)(j) = M(i)(j) + other(i)(j)
         
-        Matrix(newM)
+        newM
 
     def *(other: Matrix): Matrix = 
         assert(cols == other.rows, "Dimensions are not valid for multiplication!")
@@ -35,7 +39,7 @@ case class Matrix (private val M: Array[Array[Float]]):
         val B = stackalloc[CFloat](m * p)
         for i <- 0 until m do 
             for j <- 0 until p do
-                !(B + i * p + j) = other.M(i)(j)
+                !(B + i * p + j) = other(i)(j)
         
         val res = stackalloc[CFloat](n * p)
         mult(n, m, p, A, B, res)
@@ -45,18 +49,13 @@ case class Matrix (private val M: Array[Array[Float]]):
             for j <- 0 until p do
                 newM(i)(j) = !(res + i * p + j)
         
-        Matrix(newM)
+        newM
     
-    def map(f: Float => Float): Matrix = 
-        Matrix(M.map(_.map(f)))
-    
-    def getM(): Array[Array[Float]] = 
-        M.map(_.clone()).clone()
-
-    override def toString(): String = M.map(_.mkString(", ")).mkString("\n")
+    def mmap(f: Float => Float): Matrix = 
+        M.map(_.map(f))
 
 object Matrix:
 
     def fillRandom(rows: Int, cols: Int): Matrix = 
         import util.Random.nextFloat
-        Matrix(Array.fill(rows)(Array.fill(cols)(nextFloat())))
+        Array.fill(rows)(Array.fill(cols)(nextFloat()))
