@@ -9,7 +9,7 @@ lazy val test_images = Image.readImages(
     labelFile = "../MNIST/test_set/t10k-labels-idx1-ubyte"
 )
 
-val nn = NeuralNetwork(784, 16, 16, 10)
+val nn = NeuralNetwork.ofDim(784, 16, 16, 10)
 
 def testNetwork() = 
     val images = test_images.iterator
@@ -22,7 +22,7 @@ def testNetwork() =
         println("Try another image? (y/n)")
         continue = io.StdIn.readLine("Your choice: ") == "y"
 
-def trainNetwork() = ???
+def trainNetwork() = nn.SGD(training_images.map(_.toColumnVector()))
 
 def saveNetwork() = ???
 

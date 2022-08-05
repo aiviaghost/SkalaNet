@@ -2,8 +2,8 @@ package SkalaNet
 
 import SkalaNet.Types.*
 
-case class NeuralNetwork (private val layers: Int*):
-    private val dimensions = layers.tail.zip(layers)
+case class NeuralNetwork private (private val layerSizes: Seq[Int]):
+    private val dimensions = layerSizes.tail.zip(layerSizes)
     private val weights = dimensions.map((n, m) => Matrix.fillRandom(n, m))
     private val biases = dimensions.map((n, _) => Matrix.fillRandom(n, 1))
     
@@ -16,3 +16,10 @@ case class NeuralNetwork (private val layers: Int*):
     // query the network using a matrix representing the image
     def apply(inp: Matrix): Int = 
         feedforward(inp).flatten.zipWithIndex.max._2
+
+    // perform stochastic gradient descent
+    def SGD(trainingData: Seq[Matrix]): Unit = ???
+
+object NeuralNetwork:
+
+    def ofDim(layerSizes: Int*): NeuralNetwork = NeuralNetwork(layerSizes)
