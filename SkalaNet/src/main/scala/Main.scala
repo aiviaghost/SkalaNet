@@ -1,10 +1,10 @@
 package SkalaNet
 
-lazy val training_images = Image.readImages(
+lazy val trainingImages = Image.readImages(
     imageFile = "../MNIST/training_set/train-images-idx3-ubyte",
     labelFile = "../MNIST/training_set/train-labels-idx1-ubyte"
 )
-lazy val test_images = Image.readImages(
+lazy val testImages = Image.readImages(
     imageFile = "../MNIST/test_set/t10k-images-idx3-ubyte", 
     labelFile = "../MNIST/test_set/t10k-labels-idx1-ubyte"
 )
@@ -12,7 +12,7 @@ lazy val test_images = Image.readImages(
 val nn = NeuralNetwork.ofDim(784, 16, 16, 10)
 
 def testNetwork() = 
-    val images = test_images.iterator
+    val images = testImages.iterator
     var continue = true
     while images.hasNext && continue do
         val image = images.next()
@@ -22,7 +22,11 @@ def testNetwork() =
         println("Try another image? (y/n)")
         continue = io.StdIn.readLine("Your choice: ") == "y"
 
-def trainNetwork() = nn.SGD(training_images.map(_.toColumnVector()))
+def trainNetwork() = nn.SGD(
+        trainingData = trainingImages.map(_.toColumnVector()), 
+        epochs = 1,
+        batchSize = 100
+    )
 
 def saveNetwork() = ???
 
