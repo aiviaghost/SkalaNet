@@ -50,9 +50,6 @@ extension (M: Matrix)
                 newM(i)(j) = !(res + i * p + j)
         
         newM
-    
-    def mmap(f: Float => Float): Matrix = 
-        M.map(_.map(f))
 
 object Matrix:
 
