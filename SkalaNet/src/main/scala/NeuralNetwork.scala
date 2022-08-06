@@ -18,7 +18,17 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         feedforward(inp).flatten.zipWithIndex.max._2
 
     // perform stochastic gradient descent
-    def SGD(trainingData: Seq[Matrix], epochs: Int, batchSize: Int): Unit = ???
+    def SGD(trainingData: Seq[(Matrix, Int)], epochs: Int, batchSize: Int): Unit = 
+        import util.Random.shuffle
+        val n = trainingData.size
+        for epoch <- 1 to epochs do
+            val shuffled = shuffle(trainingData)
+            val miniBatches = (for i <- 0 until n by batchSize 
+                                yield shuffled.slice(i, i + batchSize))
+            for batch <- miniBatches do
+                backprop(batch)
+    
+    private def backprop(batch: Seq[(Matrix, Int)]) = ???
 
 object NeuralNetwork:
 

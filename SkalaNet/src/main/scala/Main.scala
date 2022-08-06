@@ -27,9 +27,8 @@ def tryNetwork() =
         println("Try another image? (y/n)")
         continue = io.StdIn.readLine("Your choice: ") == "y"
 
-
 def trainNetwork() = nn.SGD(
-        trainingData = trainingImages.map(_.toColumnVector()), 
+        trainingData = trainingImages.map(img => (img.toColumnVector(), img.label)), 
         epochs = 1,
         batchSize = 100
     )
