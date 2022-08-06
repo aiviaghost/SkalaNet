@@ -11,7 +11,12 @@ lazy val testImages = Image.readImages(
 
 val nn = NeuralNetwork.ofDim(784, 16, 16, 10)
 
-def testNetwork() = 
+def scoreNetwork() = 
+    println("Scoring network accuracy. (This may take a while)")
+    val score = testImages.count(img => nn(img.toColumnVector()) == img.label) / testImages.size.toDouble
+    println(s"Network accuracy is ${score * 100}%.")
+
+def tryNetwork() = 
     val images = testImages.iterator
     var continue = true
     while images.hasNext && continue do
@@ -21,6 +26,7 @@ def testNetwork() =
         println(s"The correct answer is ${image.label}.")
         println("Try another image? (y/n)")
         continue = io.StdIn.readLine("Your choice: ") == "y"
+
 
 def trainNetwork() = nn.SGD(
         trainingData = trainingImages.map(_.toColumnVector()), 
@@ -37,7 +43,8 @@ def help() = ???
 def quit() = System.exit(0)
 
 val menuOptions = Seq(
-    ("Test network", testNetwork _),
+    ("Try network", tryNetwork _),
+    ("Score network", scoreNetwork _),
     ("Train network", trainNetwork _),
     ("Save network", saveNetwork _),
     ("Load network", loadNetwork _),
