@@ -26,6 +26,16 @@ extension (M: Matrix)
         
         newM
 
+    def -(other: Matrix): Matrix = 
+        assert(rows == other.rows && cols == other.cols, "Matrix dimensions do not match!")
+
+        val newM = Array.fill(rows)(Array.ofDim[Float](cols))
+        for i <- 0 until rows do 
+            for j <- 0 until cols do
+                newM(i)(j) = M(i)(j) - other(i)(j)
+        
+        newM
+        
     def *(other: Matrix): Matrix = 
         assert(cols == other.rows, "Dimensions are not valid for multiplication!")
         
@@ -50,9 +60,15 @@ extension (M: Matrix)
                 newM(i)(j) = !(res + i * p + j)
         
         newM
+    
+    def *(c: Float): Matrix = 
+        M.map(_.map(z => c * z))
 
 object Matrix:
 
     def fillRandom(rows: Int, cols: Int): Matrix = 
         import util.Random.nextFloat
         Array.fill(rows)(Array.fill(cols)(nextFloat()))
+
+    def zeros(rows: Int, cols: Int): Matrix = 
+        Array.fill(rows)(Array.ofDim(cols))
