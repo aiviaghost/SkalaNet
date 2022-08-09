@@ -40,8 +40,8 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
             nablaW = nablaW.zip(deltaW).map((nw, dw) => nw + dw)
             nablaB = nablaB.zip(deltaB).map((nb, db) => nb + db)
         val len = batch.size.toFloat
-        weights = weights.zip(nablaW).map((w, nw) => w - nw * ((1 / len)))
-        biases = biases.zip(nablaB).map((b, nb) => b - nb * ((1 / len)))
+        weights = weights.zip(nablaW).map((w, nw) => w - nw * (1 / len))
+        biases = biases.zip(nablaB).map((b, nb) => b - nb * (1 / len))
 
     private def backprop(inp: Matrix, expectedAns: Int): (Seq[Matrix], Seq[Matrix]) = ???
 

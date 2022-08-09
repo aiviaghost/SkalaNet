@@ -19,7 +19,7 @@ extension (M: Matrix)
     def +(other: Matrix): Matrix = 
         assert(rows == other.rows && cols == other.cols, "Matrix dimensions do not match!")
 
-        val newM = Array.fill(rows)(Array.ofDim[Float](cols))
+        val newM = Array.ofDim[Float](rows, cols)
         for i <- 0 until rows do 
             for j <- 0 until cols do
                 newM(i)(j) = M(i)(j) + other(i)(j)
@@ -29,7 +29,7 @@ extension (M: Matrix)
     def -(other: Matrix): Matrix = 
         assert(rows == other.rows && cols == other.cols, "Matrix dimensions do not match!")
 
-        val newM = Array.fill(rows)(Array.ofDim[Float](cols))
+        val newM = Array.ofDim[Float](rows, cols)
         for i <- 0 until rows do 
             for j <- 0 until cols do
                 newM(i)(j) = M(i)(j) - other(i)(j)
@@ -54,7 +54,7 @@ extension (M: Matrix)
         val res = stackalloc[CFloat](n * p)
         mult(n, m, p, A, B, res)
         
-        val newM = Array.fill(n)(Array.ofDim[Float](p))
+        val newM = Array.ofDim[Float](n, p)
         for i <- 0 until n do 
             for j <- 0 until p do
                 newM(i)(j) = !(res + i * p + j)
@@ -71,4 +71,4 @@ object Matrix:
         Array.fill(rows)(Array.fill(cols)(nextFloat()))
 
     def zeros(rows: Int, cols: Int): Matrix = 
-        Array.fill(rows)(Array.ofDim(cols))
+        Array.ofDim(rows, cols)
