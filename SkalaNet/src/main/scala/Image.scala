@@ -20,7 +20,7 @@ object Image:
 
     private def readLabels(labelFile: String): Seq[Int] = readBytes(labelFile).drop(8).map(_.toInt)
 
-    def readImages(imageFile: String, labelFile: String): Seq[Image] = 
+    def readImages(imageFile: String, labelFile: String): IndexedSeq[Image] = 
         val labels = readLabels(labelFile)
         readBytes(imageFile).drop(16)
                             .map(_.toInt & 255) // convert to unsigned "byte" by masking with 0b11111111
@@ -28,4 +28,4 @@ object Image:
                             .map(_.grouped(28).toArray)
                             .zip(labels)
                             .map((pixels, label) => Image(pixels = pixels, label = label))
-                            .toSeq
+                            .toIndexedSeq

@@ -29,7 +29,7 @@ def tryNetwork() =
 
 def trainNetwork() = nn.SGD(
         trainingData = trainingImages.map(img => (img.toColumnVector(), img.label)), 
-        epochs = 1,
+        epochs = 2,
         batchSize = 100
     )
 

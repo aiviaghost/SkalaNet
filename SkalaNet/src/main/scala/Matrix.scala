@@ -1,7 +1,7 @@
 package SkalaNet
 
 import SkalaNet.Types.*
-import scalanative.unsafe.*
+/*import scalanative.unsafe.*
 
 @extern
 def mult(
@@ -9,7 +9,7 @@ def mult(
     A: Ptr[CFloat], B: Ptr[CFloat], 
     res: Ptr[CFloat]
 ): Unit = extern
-
+*/
 extension (M: Matrix)
 
     def rows: Int = M.size
@@ -29,13 +29,8 @@ extension (M: Matrix)
     def -(other: Matrix): Matrix = 
         assert(rows == other.rows && cols == other.cols, "Matrix dimensions do not match!")
 
-        val newM = Array.ofDim[Float](rows, cols)
-        for i <- 0 until rows do 
-            for j <- 0 until cols do
-                newM(i)(j) = M(i)(j) - other(i)(j)
-        
-        newM
-        
+        M + other * -1
+     /*   
     def *(other: Matrix): Matrix = 
         assert(cols == other.rows, "Dimensions are not valid for multiplication!")
         
@@ -60,9 +55,28 @@ extension (M: Matrix)
                 newM(i)(j) = !(res + i * p + j)
         
         newM
-    
+    */
+
+    def *(other: Matrix): Matrix = 
+        assert(cols == other.rows)
+        val (n, m, p) = (rows, cols, other.cols)
+        val res = Array.ofDim[Float](n, p)
+        for i <- 0 until n do
+            for j <- 0 until p do
+                for k <- 0 until m do
+                    res(i)(j) = M(i)(k) * other(k)(j)
+        res
+
     def *(c: Float): Matrix = 
         M.map(_.map(z => c * z))
+    
+    def ⊙(other: Matrix): Matrix = 
+        assert(rows == other.rows && cols == other.cols, "Matrix dimensions differ!")
+        val res = Array.ofDim[Float](rows, cols)
+        for i <- 0 until rows do
+            for j <- 0 until cols do
+                res(i)(j) = M(i)(j) * other(i)(j)
+        res
 
 object Matrix:
 
