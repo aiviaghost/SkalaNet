@@ -4,19 +4,15 @@ import SkalaNet.Types.*
 import collection.mutable.ArrayBuffer
 import Utils.zip
 
-extension (x: Float)
-    def **(y: Int): Float = 
-        math.pow(x.toDouble, y).toFloat
-
 case class NeuralNetwork private (private val layerSizes: Seq[Int]):
     private val dimensions = layerSizes.tail.zip(layerSizes)
     private var weights = dimensions.map((n, m) => Matrix.fillRandom(n, m))
     private var biases = dimensions.map((n, _) => Matrix.fillRandom(n, 1))
-    
-    // ReLU ;)
-    private def __/(m: Matrix): Matrix = m.map(_.map(z => math.max(z, 0)))
 
-    private def reluPrime(m: Matrix): Matrix = m.map(_.map(z => if z > 0 then 1 else 0))
+    // ReLU ;)
+    private def __/(m: Matrix): Matrix = m.map(_.map(z => 1 / (1 + math.exp(-z).toFloat)))
+
+    private def reluPrime(m: Matrix): Matrix = __/(m) ⊙ (Array.fill(m.rows)(Array.fill(m.cols)(1f)) - __/(m))
 
     private def feedforward(inp: Matrix): Matrix = 
         weights.zip(biases).foldLeft(inp){case (x, (w, b)) => __/(w * x + b)}
@@ -29,7 +25,7 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         feedforward(inp).flatten.zipWithIndex.max._2
 
     // perform stochastic gradient descent
-    def SGD(trainingData: IndexedSeq[(Matrix, Int)], epochs: Int, batchSize: Int): Unit = 
+    def SGD(trainingData: IndexedSeq[Image], epochs: Int, batchSize: Int): Unit = 
         import util.Random.shuffle
         val n = trainingData.size
         for epoch <- 1 to epochs do
@@ -37,7 +33,7 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
             val miniBatches = (for i <- 0 until n by batchSize 
                                 yield shuffled.slice(i, i + batchSize))
             for batch <- miniBatches do
-                processBatch(batch)
+                processBatch(batch.map(img => (img.toColumnVector(), img.label)))
     
     private def processBatch(batch: Seq[(Matrix, Int)]): Unit = 
         var nablaW = (for w <- weights yield Matrix.zeros(w.rows, w.cols))

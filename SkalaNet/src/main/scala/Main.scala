@@ -28,8 +28,8 @@ def tryNetwork() =
         continue = io.StdIn.readLine("Your choice: ") == "y"
 
 def trainNetwork() = nn.SGD(
-        trainingData = trainingImages.map(img => (img.toColumnVector(), img.label)), 
-        epochs = 2,
+        trainingData = trainingImages, 
+        epochs = 5,
         batchSize = 100
     )
 
