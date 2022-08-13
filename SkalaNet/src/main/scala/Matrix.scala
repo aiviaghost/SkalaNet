@@ -2,9 +2,12 @@ package SkalaNet
 
 import math.min
 import util.Random.nextGaussian
-import SkalaNet.Types.*
 
-extension (M: Matrix)
+extension [T](x: T)(using n: Numeric[T])
+
+    def *(m: Matrix): Matrix = m * x
+
+case class Matrix private (private val M: Array[Array[Float]]):
 
     def rows: Int = M.size
 
@@ -12,18 +15,16 @@ extension (M: Matrix)
 
     def +(other: Matrix): Matrix = 
         assert(rows == other.rows && cols == other.cols, "Matrix dimensions do not match!")
-
+        
         val newM = Array.ofDim[Float](rows, cols)
         for i <- 0 until rows do 
             for j <- 0 until cols do
-                newM(i)(j) = M(i)(j) + other(i)(j)
+                newM(i)(j) = M(i)(j) + other.M(i)(j)
         
-        newM
+        Matrix(newM)
 
     def -(other: Matrix): Matrix = 
-        assert(rows == other.rows && cols == other.cols, "Matrix dimensions do not match!")
-
-        M + other * -1
+        this + other * -1
 
     def *(other: Matrix): Matrix = 
         assert(cols == other.rows)
@@ -36,24 +37,41 @@ extension (M: Matrix)
                     for i <- I until min(I + T, n) do
                         for j <- J until min(J + T, p) do
                             for k <- K until min(K + T, m) do
-                                res(i)(j) += M(i)(k) * other(k)(j)
-        res
+                                res(i)(j) += M(i)(k) * other.M(k)(j)
+        Matrix(res)
 
-    def *(c: Float): Matrix = 
-        M.map(_.map(z => c * z))
+    def *[T](c: T)(using n: Numeric[T]): Matrix = 
+        import n.mkNumericOps
+        Matrix(M.map(_.map(z => c.toFloat * z)))
     
     def ⊙(other: Matrix): Matrix = 
         assert(rows == other.rows && cols == other.cols, "Matrix dimensions differ!")
+
         val res = Array.ofDim[Float](rows, cols)
         for i <- 0 until rows do
             for j <- 0 until cols do
-                res(i)(j) = M(i)(j) * other(i)(j)
-        res
+                res(i)(j) = M(i)(j) * other.M(i)(j)
+        Matrix(res)
+    
+    def transpose: Matrix = Matrix(M.transpose)
 
 object Matrix:
 
+    def fromArray(m: Array[Array[Float]]): Matrix = Matrix(m)
+
     def fillRandom(rows: Int, cols: Int): Matrix = 
-        Array.fill(rows)(Array.fill(cols)(nextGaussian().toFloat))
+        Matrix(Array.fill(rows)(Array.fill(cols)(nextGaussian().toFloat)))
 
     def zeros(rows: Int, cols: Int): Matrix = 
-        Array.ofDim(rows, cols)
+        Matrix(Array.ofDim(rows, cols))
+    
+    def ones(rows: Int, cols: Int): Matrix = 
+        Matrix(Array.fill(rows)(Array.fill(cols)(1f)))
+    
+    def argmax(m: Matrix): Int = 
+        assert(m.cols == 1, "Matrix is not a column vector!")
+
+        m.M.flatten.zipWithIndex.max._2
+    
+    def map(f: Float => Float, m: Matrix): Matrix = 
+        Matrix(m.M.map(_.map(z => f(z))))

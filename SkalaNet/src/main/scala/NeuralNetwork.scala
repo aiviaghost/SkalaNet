@@ -1,6 +1,5 @@
 package SkalaNet
 
-import SkalaNet.Types.*
 import collection.mutable.ArrayBuffer
 import Utils.zip
 
@@ -10,19 +9,19 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
     private var biases = dimensions.map((n, _) => Matrix.fillRandom(n, 1))
 
     // ReLU ;)
-    private def __/(m: Matrix): Matrix = m.map(_.map(z => 1 / (1 + math.exp(-z).toFloat)))
+    private def __/(m: Matrix): Matrix = Matrix.map(z => 1 / (1 + math.exp(-z).toFloat), m)
 
-    private def reluPrime(m: Matrix): Matrix = __/(m) ⊙ (Array.fill(m.rows)(Array.fill(m.cols)(1f)) - __/(m))
+    private def reluPrime(m: Matrix): Matrix = __/(m) ⊙ (Matrix.ones(m.rows, m.cols) - __/(m))
 
     private def feedforward(inp: Matrix): Matrix = 
         weights.zip(biases).foldLeft(inp){case (x, (w, b)) => __/(w * x + b)}
 
     private def costPrime(output: Matrix, expectedOutput: Matrix): Matrix = 
-        (output - expectedOutput) * 2
+        2 * (output - expectedOutput)
 
     // query the network using a matrix representing the image
     def apply(inp: Matrix): Int = 
-        feedforward(inp).flatten.zipWithIndex.max._2
+        Matrix.argmax(feedforward(inp))
 
     // perform stochastic gradient descent
     def SGD(trainingData: IndexedSeq[Image], epochs: Int, batchSize: Int): Unit = 
@@ -63,7 +62,7 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         
         val expectedOutput = Array.ofDim[Float](10, 1)
         expectedOutput(expectedAns)(0) = 1f
-        var delta = costPrime(as.last, expectedOutput) ⊙ reluPrime(zs.last)
+        var delta = costPrime(as.last, Matrix.fromArray(expectedOutput)) ⊙ reluPrime(zs.last)
         deltaW.append(delta * as.init.last.transpose)
         deltaB.append(delta)
 

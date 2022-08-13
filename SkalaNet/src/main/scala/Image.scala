@@ -1,10 +1,8 @@
 package SkalaNet
 
-import SkalaNet.Types.*
-
 case class Image private (val label: Int, private val pixels: Array[Array[Int]]):
 
-    def toColumnVector(): Matrix = pixels.flatten.map(pixel => Array(pixel / 255f))
+    def toColumnVector(): Matrix = Matrix.fromArray(pixels.flatten.map(pixel => Array(pixel / 255f)))
 
     override def toString(): String = 
         val byte2ascii = """ .'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"""
