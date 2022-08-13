@@ -14,7 +14,7 @@ val nn = NeuralNetwork.ofDim(784, 16, 16, 10)
 def scoreNetwork() = 
     println("Scoring network accuracy. (This may take a while)")
     val score = testImages.count(img => nn(img.toColumnVector()) == img.label) / testImages.size.toDouble
-    println(s"Network accuracy is ${score * 100}%.")
+    println(f"Network accuracy is ${score * 100}%3.2f%%.")
 
 def tryNetwork() = 
     val images = testImages.iterator
