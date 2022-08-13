@@ -9,13 +9,12 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
     private var weights = dimensions.map((n, m) => Matrix.fillRandom(n, m))
     private var biases = dimensions.map((n, _) => Matrix.fillRandom(n, 1))
 
-    // ReLU ;)
-    private def __/(m: Matrix): Matrix = Matrix.map(z => 1 / (1 + math.exp(-z).toFloat), m)
+    private def sigmoid(m: Matrix): Matrix = Matrix.map(z => 1 / (1 + math.exp(-z).toFloat), m)
 
-    private def reluPrime(m: Matrix): Matrix = __/(m) ⊙ (Matrix.ones(m.rows, m.cols) - __/(m))
+    private def sigmoidPrime(m: Matrix): Matrix = sigmoid(m) ⊙ (Matrix.ones(m.rows, m.cols) - sigmoid(m))
 
     private def feedforward(inp: Matrix): Matrix = 
-        weights.zip(biases).foldLeft(inp){case (x, (w, b)) => __/(w * x + b)}
+        weights.zip(biases).foldLeft(inp){case (x, (w, b)) => sigmoid(w * x + b)}
 
     private def costPrime(output: Matrix, expectedOutput: Matrix): Matrix = 
         2 * (output - expectedOutput)
@@ -63,19 +62,18 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
             case (x, (w, b)) => 
                 val z = w * x + b
                 zs.append(z)
-                val a = __/(z)
+                val a = sigmoid(z)
                 as.append(a)
                 a
         }
         
-        val expectedOutput = Array.ofDim[Float](10, 1)
-        expectedOutput(expectedAns)(0) = 1f
-        var delta = costPrime(as.last, Matrix.fromArray(expectedOutput)) ⊙ reluPrime(zs.last)
+        val targetVector = Matrix.makeTargetVector(layerSizes.last, expectedAns)
+        var delta = costPrime(as.last, targetVector) ⊙ sigmoidPrime(zs.last)
         deltaW.append(delta * as.init.last.transpose)
         deltaB.append(delta)
 
         for (w_next, z, a_prev) <- zip(weights.tail, zs.init, as.init.init).reverse do
-            delta = (w_next.transpose * delta) ⊙ reluPrime(z)
+            delta = (w_next.transpose * delta) ⊙ sigmoidPrime(z)
             deltaB.append(delta)
             deltaW.append(delta * a_prev.transpose)
         (deltaW.reverse.toSeq, deltaB.reverse.toSeq)

@@ -75,3 +75,8 @@ object Matrix:
     
     def map(f: Float => Float, m: Matrix): Matrix = 
         Matrix(m.M.map(_.map(z => f(z))))
+    
+    def makeTargetVector(rows: Int, targetIndex: Int): Matrix = 
+        val m = Array.ofDim[Float](rows, 1)
+        m(targetIndex)(0) = 1f
+        Matrix(m)
