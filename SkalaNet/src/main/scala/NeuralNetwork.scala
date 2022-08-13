@@ -27,12 +27,21 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
     // perform stochastic gradient descent
     def SGD(trainingData: IndexedSeq[Image], epochs: Int, batchSize: Int): Unit = 
         val n = trainingData.size
-        for epoch <- 1 to epochs do
+        var i = 1
+        for epoch <- 0 until epochs do
             val shuffled = shuffle(trainingData)
             val miniBatches = (for i <- 0 until n by batchSize 
                                 yield shuffled.slice(i, i + batchSize))
             for batch <- miniBatches do
+                val barWidth = 100
+                val ratio = (i) / (epochs * miniBatches.size).toFloat
+                val numFill = (ratio * barWidth).toInt
+                print(f"\r[${"#" * numFill + " " * (barWidth - numFill)}]  ${(ratio * 100)}%3.1f%%")
+                i += 1
+
                 processBatch(batch.map(img => (img.toColumnVector(), img.label)))
+            
+        println()
     
     private def processBatch(batch: Seq[(Matrix, Int)]): Unit = 
         var nablaW = (for w <- weights yield Matrix.zeros(w.rows, w.cols))

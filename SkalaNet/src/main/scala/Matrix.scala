@@ -24,10 +24,10 @@ case class Matrix private (private val M: Array[Array[Float]]):
         Matrix(newM)
 
     def -(other: Matrix): Matrix = 
-        this + other * -1
+        this + -1 * other
 
     def *(other: Matrix): Matrix = 
-        assert(cols == other.rows)
+        assert(cols == other.rows, s"Matrices with dimensions ${(rows, cols)} and ${(other.rows, other.cols)} can not be multiplied!")
         val (n, m, p) = (rows, cols, other.cols)
         val T = 10
         val res = Array.ofDim[Float](n, p)

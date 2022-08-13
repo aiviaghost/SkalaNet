@@ -9,7 +9,7 @@ case class Image private (val label: Int, private val pixels: Array[Array[Int]])
     override def toString(): String = 
         val byte2ascii = """ .'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"""
         val digit = pixels.map("|" + _.map(pixel => byte2ascii(pixel * byte2ascii.size / 256)).mkString + "|").mkString("\n")
-        val bar = "+" + "-".padTo(28, "-").mkString + "+" // "-".repeat(28) is not supported by Scala Native (https://github.com/scala-native/scala-native/pull/2711) :(
+        val bar = "+" + "-" * 28 + "+"
         Seq(bar, digit, bar).mkString("\n")
 
 object Image:
