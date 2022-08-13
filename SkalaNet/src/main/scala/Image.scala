@@ -1,5 +1,7 @@
 package SkalaNet
 
+import java.nio.file.{Files, Paths}
+
 case class Image private (val label: Int, private val pixels: Array[Array[Int]]):
 
     def toColumnVector(): Matrix = Matrix.fromArray(pixels.flatten.map(pixel => Array(pixel / 255f)))
@@ -13,7 +15,6 @@ case class Image private (val label: Int, private val pixels: Array[Array[Int]])
 object Image:
 
     private def readBytes(file: String) = 
-        import java.nio.file.{Files, Paths}
         Files.readAllBytes(Paths.get(file))
 
     private def readLabels(labelFile: String): Seq[Int] = readBytes(labelFile).drop(8).map(_.toInt)

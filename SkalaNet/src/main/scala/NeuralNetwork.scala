@@ -2,6 +2,7 @@ package SkalaNet
 
 import collection.mutable.ArrayBuffer
 import Utils.zip
+import util.Random.shuffle
 
 case class NeuralNetwork private (private val layerSizes: Seq[Int]):
     private val dimensions = layerSizes.tail.zip(layerSizes)
@@ -25,7 +26,6 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
 
     // perform stochastic gradient descent
     def SGD(trainingData: IndexedSeq[Image], epochs: Int, batchSize: Int): Unit = 
-        import util.Random.shuffle
         val n = trainingData.size
         for epoch <- 1 to epochs do
             val shuffled = shuffle(trainingData)
