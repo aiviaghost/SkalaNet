@@ -1,7 +1,7 @@
 package SkalaNet
 
 import collection.mutable.ArrayBuffer
-import Utils.zip
+import Utils.*
 import util.Random.shuffle
 
 case class NeuralNetwork private (private val layerSizes: Seq[Int]):
@@ -25,21 +25,13 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
 
     // perform stochastic gradient descent
     def SGD(trainingData: IndexedSeq[Image], epochs: Int, batchSize: Int): Unit = 
-        var it = 1
-        for epoch <- 0 until epochs do
+        for epoch <- 1 to epochs do
+            println(s"Epoch ${epoch}:")
             val shuffled = shuffle(trainingData)
             val miniBatches = (for i <- 0 until trainingData.size by batchSize 
                                 yield shuffled.slice(i, i + batchSize))
-            for batch <- miniBatches do
-                val barWidth = 100
-                val completedRatio = it / (epochs * miniBatches.size).toFloat
-                val numFill = (completedRatio * barWidth).toInt
-                print(f"\r[${"#" * numFill + " " * (barWidth - numFill)}]  ${(completedRatio * 100)}%3.1f%%")
-                it += 1
-
+            for batch <- progressBar(miniBatches) do
                 processBatch(batch.map(img => (img.toColumnVector(), img.label)))
-            
-        println()
     
     private def processBatch(batch: Seq[(Matrix, Int)]): Unit = 
         var nablaW = (for w <- weights yield Matrix.zeros(w.rows, w.cols))
