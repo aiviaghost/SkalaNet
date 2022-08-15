@@ -72,7 +72,7 @@ object Matrix:
         Matrix(Array.fill(rows)(Array.fill(cols)(1f)))
     
     def argmax(m: Matrix): Int = 
-        assert(m.cols == 1, "Matrix is not a column vector!")
+        assert(m.rows == 1 || m.cols == 1, "Matrix is not a vector!")
 
         m.M.flatten.zipWithIndex.max._2
     
