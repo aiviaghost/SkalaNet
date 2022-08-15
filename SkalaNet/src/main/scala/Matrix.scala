@@ -77,7 +77,7 @@ object Matrix:
         m.M.flatten.zipWithIndex.max._2
     
     def map(f: Float => Float, m: Matrix): Matrix = 
-        Matrix(m.M.map(_.map(z => f(z))))
+        Matrix(m.M.map(_.map(f)))
     
     def makeTargetVector(rows: Int, targetIndex: Int): Matrix = 
         val m = Array.ofDim[Float](rows, 1)
