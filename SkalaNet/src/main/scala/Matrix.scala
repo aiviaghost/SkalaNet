@@ -57,7 +57,10 @@ case class Matrix private (private val M: Array[Array[Float]]):
 
 object Matrix:
 
-    def fromArray(m: Array[Array[Float]]): Matrix = Matrix(m)
+    def fromArray(m: Array[Array[Float]]): Matrix = 
+        assert(m.forall(_.size == m(0).size), "Not all rows are of equal length!")
+        
+        Matrix(m)
 
     def fillRandom(rows: Int, cols: Int): Matrix = 
         Matrix(Array.fill(rows)(Array.fill(cols)(nextGaussian().toFloat)))
