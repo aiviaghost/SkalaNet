@@ -24,16 +24,23 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         Matrix.argmax(feedforward(inp))
 
     // perform stochastic gradient descent
-    def SGD(trainingData: IndexedSeq[Image], epochs: Int, batchSize: Int): Unit = 
-        for epoch <- 1 to epochs do
-            println(s"Epoch ${epoch}:")
+    def SGD(trainingData: IndexedSeq[Image], epochs: Int, batchSize: Int, eta: Float = 1): Unit = 
+        ProgressBar(
+            1 to epochs, 
+            displayTotalTime = true, 
+            name = "Training",
+            displayIterationMessage = true,
+            iterationMessage = (_, i) => s"Epoch ${i} / ${epochs}:"
+        ).foreach{epoch => 
             val shuffled = shuffle(trainingData)
             val miniBatches = (for i <- 0 until trainingData.size by batchSize 
                                 yield shuffled.slice(i, i + batchSize))
-            for batch <- progressBar(miniBatches) do
-                processBatch(batch.map(img => (img.toColumnVector(), img.label)))
+            ProgressBar(miniBatches, displayBar = true).foreach{batch => 
+                processBatch(batch.map(img => (img.toColumnVector(), img.label)), eta)
+            }
+        }
     
-    private def processBatch(batch: Seq[(Matrix, Int)]): Unit = 
+    private def processBatch(batch: Seq[(Matrix, Int)], eta: Float): Unit = 
         var nablaW = (for w <- weights yield Matrix.zeros(w.rows, w.cols))
         var nablaB = (for b <- biases yield Matrix.zeros(b.rows, b.cols))
         for (m, ans) <- batch do
@@ -41,8 +48,8 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
             nablaW = nablaW.zip(deltaW).map((nw, dw) => nw + dw)
             nablaB = nablaB.zip(deltaB).map((nb, db) => nb + db)
         val len = batch.size.toFloat
-        weights = weights.zip(nablaW).map((w, nw) => w - nw * (1 / len))
-        biases = biases.zip(nablaB).map((b, nb) => b - nb * (1 / len))
+        weights = weights.zip(nablaW).map((w, nw) => w - eta * nw * (1 / len))
+        biases = biases.zip(nablaB).map((b, nb) => b - eta * nb * (1 / len))
 
     private def backprop(inp: Matrix, expectedAns: Int): (Seq[Matrix], Seq[Matrix]) = 
         val deltaW = ArrayBuffer[Matrix]()
