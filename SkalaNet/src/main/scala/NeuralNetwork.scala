@@ -29,8 +29,7 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
             1 to epochs, 
             displayTotalTime = true, 
             name = "Training",
-            displayIterationMessage = true,
-            iterationMessage = (_, i) => s"Epoch ${i} / ${epochs}:"
+            iterationMessage = (_: Int, i: Int) => s"Epoch ${i} / ${epochs}:"
         ).foreach{epoch => 
             val shuffled = shuffle(trainingData)
             val miniBatches = (for i <- 0 until trainingData.size by batchSize 

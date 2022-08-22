@@ -1,16 +1,20 @@
 package SkalaNet
 
+implicit def iterationMessageConvert[T](f: (T, Int) => String): IterationMessage[T] = IterationMessage(f, true)
+
+case class IterationMessage[T](f: (T, Int) => String, val displayIterationMessage: Boolean = false):
+    def apply(item: T, i: Int): String = f(item, i)
+
 case class ProgressBar[T](
     xs: IterableOnce[T], 
     width: Int = 100, 
     name: String = "", 
     displayBar: Boolean = false, 
     displayTotalTime: Boolean = false,
-    displayIterationMessage: Boolean = false,
-    iterationMessage: (T, Int) => String = (a: T, b) => ""
+    iterationMessage: IterationMessage[T] = IterationMessage((a: T, b) => "")
 ) extends Iterator[T]:
-    assert(displayBar || displayTotalTime || displayIterationMessage, "Progress bar needs to print something!")
-    assert(!(displayBar && displayIterationMessage), "ProgressBar does not support displaying a progress bar and an iteration message simultaneously!")
+    assert(displayBar || displayTotalTime || iterationMessage.displayIterationMessage, "Progress bar needs to print something!")
+    assert(!(displayBar && iterationMessage.displayIterationMessage), "ProgressBar does not support displaying a progress bar and an iteration message simultaneously!")
     assert(!displayTotalTime || name != "", "Progress bar needs a name if it should print total time!")
     
     val it = xs.iterator
@@ -25,7 +29,7 @@ case class ProgressBar[T](
     
     def next(): T = 
         val nextItem = it.next()
-        if displayIterationMessage then
+        if iterationMessage.displayIterationMessage then
             println(iterationMessage(nextItem, i))
         if displayBar then
             val completedRatio = i / xs.size.toFloat
