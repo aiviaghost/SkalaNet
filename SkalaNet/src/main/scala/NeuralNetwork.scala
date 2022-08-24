@@ -70,10 +70,10 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         deltaW.append(delta * as.init.last.transpose)
         deltaB.append(delta)
 
-        for (w_next, z, a_prev) <- zip(weights.tail, zs.init, as.init.init).reverse do
-            delta = (w_next.transpose * delta) ⊙ sigmoidPrime(z)
+        for (wNext, z, aPrev) <- zip(weights.tail, zs.init, as.init.init).reverse do
+            delta = (wNext.transpose * delta) ⊙ sigmoidPrime(z)
             deltaB.append(delta)
-            deltaW.append(delta * a_prev.transpose)
+            deltaW.append(delta * aPrev.transpose)
         (deltaW.reverse.toSeq, deltaB.reverse.toSeq)
 
 object NeuralNetwork:
