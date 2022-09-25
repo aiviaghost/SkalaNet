@@ -12,7 +12,7 @@ lazy val testImages = Image.readImages(
 val nn = NeuralNetwork.ofDim(784, 16, 16, 10)
 
 def scoreNetwork() =
-    println("Scoring network accuracy. (This may take a while)")
+    println("Scoring network accuracy ...")
     val score = testImages.count(img =>
         nn(img.toColumnVector()) == img.label
     ) / testImages.size.toDouble

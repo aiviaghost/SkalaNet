@@ -42,33 +42,38 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         ).foreach { epoch =>
             val shuffled = shuffle(trainingData)
             val miniBatches =
-                (for i <- 0 until trainingData.size by batchSize
-                yield shuffled.slice(i, i + batchSize))
+                (0 until trainingData.size by batchSize).map(i =>
+                    shuffled.slice(i, i + batchSize)
+                )
             ProgressBar(
                 miniBatches,
                 displayBar = true,
                 iterationName = "batch"
             ).foreach { batch =>
-                processBatch(
-                    batch.map(img => (img.toColumnVector(), img.label)),
-                    eta
+                val (nablaW, nablaB) = processBatch(
+                    batch.map(img => (img.toColumnVector(), img.label))
                 )
+                weights = weights
+                    .zip(nablaW)
+                    .map((w, nw) => w - eta * (1.0 / batchSize) * nw)
+                biases = biases
+                    .zip(nablaB)
+                    .map((b, nb) => b - eta * (1.0 / batchSize) * nb)
             }
         }
 
     private def processBatch(
-        batch: IndexedSeq[(Matrix, Int)],
-        eta: Float
-    ): Unit =
+        batch: IndexedSeq[(Matrix, Int)]
+    ): (Seq[Matrix], Seq[Matrix]) =
         var nablaW = (for w <- weights yield Matrix.zeros(w.rows, w.cols))
         var nablaB = (for b <- biases yield Matrix.zeros(b.rows, b.cols))
+
         for (m, ans) <- batch do
             val (deltaW, deltaB) = backprop(m, ans)
             nablaW = nablaW.zip(deltaW).map((nw, dw) => nw + dw)
             nablaB = nablaB.zip(deltaB).map((nb, db) => nb + db)
-        val len = batch.size.toFloat
-        weights = weights.zip(nablaW).map((w, nw) => w - eta * nw * (1 / len))
-        biases = biases.zip(nablaB).map((b, nb) => b - eta * nb * (1 / len))
+
+        (nablaW, nablaB)
 
     private def backprop(
         inp: Matrix,
@@ -101,6 +106,7 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
             delta = (wNext.transpose * delta) ⊙ sigmoidPrime(z)
             deltaB.append(delta)
             deltaW.append(delta * aPrev.transpose)
+
         (deltaW.reverse.toSeq, deltaB.reverse.toSeq)
 
 object NeuralNetwork:
