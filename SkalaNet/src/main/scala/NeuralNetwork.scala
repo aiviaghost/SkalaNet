@@ -9,9 +9,11 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
     private var weights = dimensions.map((n, m) => Matrix.fillRandom(n, m))
     private var biases = dimensions.map((n, _) => Matrix.fillRandom(n, 1))
 
-    private def sigmoid(m: Matrix): Matrix = Matrix.map(z => 1 / (1 + math.exp(-z).toFloat), m)
+    private def sigmoid(m: Matrix): Matrix = 
+        Matrix.map(z => 1 / (1 + math.exp(-z).toFloat), m)
 
-    private def sigmoidPrime(m: Matrix): Matrix = sigmoid(m) ⊙ (Matrix.ones(m.rows, m.cols) - sigmoid(m))
+    private def sigmoidPrime(m: Matrix): Matrix = 
+        sigmoid(m) ⊙ (Matrix.ones(m.rows, m.cols) - sigmoid(m))
 
     private def feedforward(inp: Matrix): Matrix = 
         weights.zip(biases).foldLeft(inp){case (x, (w, b)) => sigmoid(w * x + b)}
@@ -24,7 +26,12 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         Matrix.argmax(feedforward(inp))
 
     // perform stochastic gradient descent
-    def SGD(trainingData: IndexedSeq[Image], epochs: Int, batchSize: Int, eta: Float = 1): Unit = 
+    def SGD(
+        trainingData: IndexedSeq[Image], 
+        epochs: Int, 
+        batchSize: Int, 
+        eta: Float = 1
+    ): Unit = 
         ProgressBar(
             1 to epochs, 
             displayTotalTime = true, 

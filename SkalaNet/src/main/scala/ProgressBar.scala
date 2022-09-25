@@ -14,9 +14,18 @@ case class ProgressBar[T](
     iterationMessage: IterationMessage[T] = IterationMessage((a: T, b) => ""),
     iterationName: String = "iteration"
 ) extends Iterator[T]:
-    assert(displayBar || displayTotalTime || iterationMessage.displayIterationMessage, "Progress bar needs to print something!")
-    assert(!(displayBar && iterationMessage.displayIterationMessage), "ProgressBar does not support displaying a progress bar and an iteration message simultaneously!")
-    assert(!displayTotalTime || name != "", "Progress bar needs a name if it should print total time!")
+    assert(
+        displayBar || displayTotalTime || iterationMessage.displayIterationMessage, 
+        "Progress bar needs to print something!"
+    )
+    assert(
+        !(displayBar && iterationMessage.displayIterationMessage), 
+        "ProgressBar does not support displaying a progress bar and an iteration message simultaneously!"
+    )
+    assert(
+        !displayTotalTime || name != "", 
+        "Progress bar needs a name if it should print total time!"
+    )
     
     val it = xs.iterator
     var i = 1
@@ -38,8 +47,10 @@ case class ProgressBar[T](
             val completedRatio = i / xs.size.toFloat
             val numFill = (completedRatio * width).toInt
             val avg_time = (System.nanoTime() - t0) / (1e9 * i)
-            print(f"\r[${"#" * numFill + " " * (width - numFill)}]  ${(completedRatio * 100)}%.1f%% | ${avg_time}%.4fs / ${iterationName}")
-            if i == xs.size then println()
+            val completedBar = "#" * numFill + " " * (width - numFill)
+            print(f"\r[${completedBar}]  ${(completedRatio * 100)}%.1f%% | ${avg_time}%.4fs / ${iterationName}")
+            if i == xs.size then
+                println()
         
         i += 1
         nextItem

@@ -4,11 +4,14 @@ import java.nio.file.{Files, Paths}
 
 case class Image private (val label: Int, private val pixels: Array[Array[Int]]):
 
-    def toColumnVector(): Matrix = Matrix.fromArray(pixels.flatten.map(pixel => Array(pixel / 255f)))
+    def toColumnVector(): Matrix = 
+        Matrix.fromArray(pixels.flatten.map(pixel => Array(pixel / 255f)))
 
     override def toString(): String = 
         val byte2ascii = """ .'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"""
-        val digit = pixels.map("|" + _.map(pixel => byte2ascii(pixel * byte2ascii.size / 256)).mkString + "|").mkString("\n")
+        val digit = pixels.map(
+                "|" + _.map(pixel => byte2ascii(pixel * byte2ascii.size / 256)).mkString + "|"
+            ).mkString("\n")
         val bar = "+" + "-" * 28 + "+"
         Seq(bar, digit, bar).mkString("\n")
 
