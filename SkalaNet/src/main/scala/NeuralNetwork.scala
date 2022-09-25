@@ -9,48 +9,57 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
     private var weights = dimensions.map((n, m) => Matrix.fillRandom(n, m))
     private var biases = dimensions.map((n, _) => Matrix.fillRandom(n, 1))
 
-    private def sigmoid(m: Matrix): Matrix = 
+    private def sigmoid(m: Matrix): Matrix =
         Matrix.map(z => 1 / (1 + math.exp(-z).toFloat), m)
 
-    private def sigmoidPrime(m: Matrix): Matrix = 
+    private def sigmoidPrime(m: Matrix): Matrix =
         sigmoid(m) ⊙ (Matrix.ones(m.rows, m.cols) - sigmoid(m))
 
-    private def feedforward(inp: Matrix): Matrix = 
-        weights.zip(biases).foldLeft(inp){case (x, (w, b)) => sigmoid(w * x + b)}
+    private def feedforward(inp: Matrix): Matrix =
+        weights.zip(biases).foldLeft(inp) { case (x, (w, b)) =>
+            sigmoid(w * x + b)
+        }
 
-    private def costPrime(output: Matrix, expectedOutput: Matrix): Matrix = 
+    private def costPrime(output: Matrix, expectedOutput: Matrix): Matrix =
         2 * (output - expectedOutput)
 
     // query the network using a matrix representing the image
-    def apply(inp: Matrix): Int = 
+    def apply(inp: Matrix): Int =
         Matrix.argmax(feedforward(inp))
 
     // perform stochastic gradient descent
     def SGD(
-        trainingData: IndexedSeq[Image], 
-        epochs: Int, 
-        batchSize: Int, 
+        trainingData: IndexedSeq[Image],
+        epochs: Int,
+        batchSize: Int,
         eta: Float = 1
-    ): Unit = 
+    ): Unit =
         ProgressBar(
-            1 to epochs, 
-            displayTotalTime = true, 
-            name = "Training",
-            iterationMessage = (_: Int, i: Int) => s"Epoch ${i} / ${epochs}:"
-        ).foreach{epoch => 
+          1 to epochs,
+          displayTotalTime = true,
+          name = "Training",
+          iterationMessage = (_: Int, i: Int) => s"Epoch ${i} / ${epochs}:"
+        ).foreach { epoch =>
             val shuffled = shuffle(trainingData)
-            val miniBatches = (for i <- 0 until trainingData.size by batchSize 
-                                yield shuffled.slice(i, i + batchSize))
+            val miniBatches =
+                (for i <- 0 until trainingData.size by batchSize
+                yield shuffled.slice(i, i + batchSize))
             ProgressBar(
-                miniBatches, 
-                displayBar = true, 
-                iterationName = "batch"
-            ).foreach{batch => 
-                processBatch(batch.map(img => (img.toColumnVector(), img.label)), eta)
+              miniBatches,
+              displayBar = true,
+              iterationName = "batch"
+            ).foreach { batch =>
+                processBatch(
+                  batch.map(img => (img.toColumnVector(), img.label)),
+                  eta
+                )
             }
         }
-    
-    private def processBatch(batch: IndexedSeq[(Matrix, Int)], eta: Float): Unit = 
+
+    private def processBatch(
+        batch: IndexedSeq[(Matrix, Int)],
+        eta: Float
+    ): Unit =
         var nablaW = (for w <- weights yield Matrix.zeros(w.rows, w.cols))
         var nablaB = (for b <- biases yield Matrix.zeros(b.rows, b.cols))
         for (m, ans) <- batch do
@@ -61,27 +70,34 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         weights = weights.zip(nablaW).map((w, nw) => w - eta * nw * (1 / len))
         biases = biases.zip(nablaB).map((b, nb) => b - eta * nb * (1 / len))
 
-    private def backprop(inp: Matrix, expectedAns: Int): (Seq[Matrix], Seq[Matrix]) = 
+    private def backprop(
+        inp: Matrix,
+        expectedAns: Int
+    ): (Seq[Matrix], Seq[Matrix]) =
         val deltaW = ArrayBuffer[Matrix]()
         val deltaB = ArrayBuffer[Matrix]()
-        
+
         val zs = ArrayBuffer[Matrix]()
         val as = ArrayBuffer[Matrix](inp)
-        weights.zip(biases).foldLeft(inp){
-            case (x, (w, b)) => 
-                val z = w * x + b
-                zs.append(z)
-                val a = sigmoid(z)
-                as.append(a)
-                a
+        weights.zip(biases).foldLeft(inp) { case (x, (w, b)) =>
+            val z = w * x + b
+            zs.append(z)
+            val a = sigmoid(z)
+            as.append(a)
+            a
         }
-        
+
         val targetVector = Matrix.makeTargetVector(layerSizes.last, expectedAns)
         var delta = costPrime(as.last, targetVector) ⊙ sigmoidPrime(zs.last)
         deltaW.append(delta * as.init.last.transpose)
         deltaB.append(delta)
 
-        for (wNext, z, aPrev) <- zip(weights.tail, zs.init, as.init.init).reverse do
+        for (wNext, z, aPrev) <- zip(
+              weights.tail,
+              zs.init,
+              as.init.init
+            ).reverse
+        do
             delta = (wNext.transpose * delta) ⊙ sigmoidPrime(z)
             deltaB.append(delta)
             deltaW.append(delta * aPrev.transpose)
