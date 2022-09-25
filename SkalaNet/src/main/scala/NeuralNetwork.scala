@@ -35,23 +35,23 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         eta: Float = 1
     ): Unit =
         ProgressBar(
-          1 to epochs,
-          displayTotalTime = true,
-          name = "Training",
-          iterationMessage = (_: Int, i: Int) => s"Epoch ${i} / ${epochs}:"
+            1 to epochs,
+            displayTotalTime = true,
+            name = "Training",
+            iterationMessage = (_: Int, i: Int) => s"Epoch ${i} / ${epochs}:"
         ).foreach { epoch =>
             val shuffled = shuffle(trainingData)
             val miniBatches =
                 (for i <- 0 until trainingData.size by batchSize
                 yield shuffled.slice(i, i + batchSize))
             ProgressBar(
-              miniBatches,
-              displayBar = true,
-              iterationName = "batch"
+                miniBatches,
+                displayBar = true,
+                iterationName = "batch"
             ).foreach { batch =>
                 processBatch(
-                  batch.map(img => (img.toColumnVector(), img.label)),
-                  eta
+                    batch.map(img => (img.toColumnVector(), img.label)),
+                    eta
                 )
             }
         }
@@ -93,9 +93,9 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
         deltaB.append(delta)
 
         for (wNext, z, aPrev) <- zip(
-              weights.tail,
-              zs.init,
-              as.init.init
+                weights.tail,
+                zs.init,
+                as.init.init
             ).reverse
         do
             delta = (wNext.transpose * delta) ⊙ sigmoidPrime(z)

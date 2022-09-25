@@ -13,8 +13,8 @@ case class Matrix private (private val M: Array[Array[Float]]):
 
     def +(other: Matrix): Matrix =
         assert(
-          rows == other.rows && cols == other.cols,
-          "Matrix dimensions do not match!"
+            rows == other.rows && cols == other.cols,
+            "Matrix dimensions do not match!"
         )
 
         val newM = Array.ofDim[Float](rows, cols)
@@ -28,8 +28,8 @@ case class Matrix private (private val M: Array[Array[Float]]):
 
     def *(other: Matrix): Matrix =
         assert(
-          cols == other.rows,
-          s"Matrices with dimensions ${(rows, cols)} and ${(other.rows, other.cols)} can not be multiplied!"
+            cols == other.rows,
+            s"Matrices with dimensions ${(rows, cols)} and ${(other.rows, other.cols)} can not be multiplied!"
         )
         val (n, m, p) = (rows, cols, other.cols)
         val T = 10
@@ -49,8 +49,8 @@ case class Matrix private (private val M: Array[Array[Float]]):
 
     def ⊙(other: Matrix): Matrix =
         assert(
-          rows == other.rows && cols == other.cols,
-          "Matrix dimensions differ!"
+            rows == other.rows && cols == other.cols,
+            "Matrix dimensions differ!"
         )
 
         val res = Array.ofDim[Float](rows, cols)
@@ -64,8 +64,8 @@ object Matrix:
 
     def fromArray(m: Array[Array[Float]]): Matrix =
         assert(
-          m.forall(_.size == m(0).size),
-          "Not all rows are of equal length!"
+            m.forall(_.size == m(0).size),
+            "Not all rows are of equal length!"
         )
 
         Matrix(m)

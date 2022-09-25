@@ -15,9 +15,9 @@ case class Image private (
             """ .'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"""
         val digit = pixels
             .map(
-              "|" + _.map(pixel =>
-                  byte2ascii(pixel * byte2ascii.size / 256)
-              ).mkString + "|"
+                "|" + _.map(pixel =>
+                    byte2ascii(pixel * byte2ascii.size / 256)
+                ).mkString + "|"
             )
             .mkString("\n")
         val bar = "+" + "-" * 28 + "+"
@@ -36,7 +36,7 @@ object Image:
         readBytes(imageFile)
             .drop(16)
             .map(
-              _.toInt & 255
+                _.toInt & 255
             ) // convert to unsigned "byte" by masking with 0b11111111
             .grouped(28 * 28)
             .map(_.grouped(28).toArray)
