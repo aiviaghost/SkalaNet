@@ -14,10 +14,10 @@ case class Image private (val label: Int, private val pixels: Array[Array[Int]])
 
 object Image:
 
-    private def readBytes(file: String) = 
+    private def readBytes(file: String): Array[Byte] = 
         Files.readAllBytes(Paths.get(file))
 
-    private def readLabels(labelFile: String): Seq[Int] = readBytes(labelFile).drop(8).map(_.toInt)
+    private def readLabels(labelFile: String): Array[Int] = readBytes(labelFile).drop(8).map(_.toInt)
 
     def readImages(imageFile: String, labelFile: String): IndexedSeq[Image] = 
         val labels = readLabels(labelFile)

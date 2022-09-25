@@ -34,12 +34,16 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int]):
             val shuffled = shuffle(trainingData)
             val miniBatches = (for i <- 0 until trainingData.size by batchSize 
                                 yield shuffled.slice(i, i + batchSize))
-            ProgressBar(miniBatches, displayBar = true).foreach{batch => 
+            ProgressBar(
+                miniBatches, 
+                displayBar = true, 
+                iterationName = "batch"
+            ).foreach{batch => 
                 processBatch(batch.map(img => (img.toColumnVector(), img.label)), eta)
             }
         }
     
-    private def processBatch(batch: Seq[(Matrix, Int)], eta: Float): Unit = 
+    private def processBatch(batch: IndexedSeq[(Matrix, Int)], eta: Float): Unit = 
         var nablaW = (for w <- weights yield Matrix.zeros(w.rows, w.cols))
         var nablaB = (for b <- biases yield Matrix.zeros(b.rows, b.cols))
         for (m, ans) <- batch do

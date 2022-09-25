@@ -29,7 +29,7 @@ def tryNetwork() =
 
 def trainNetwork() = nn.SGD(
         trainingData = trainingImages, 
-        epochs = 10,
+        epochs = 5,
         batchSize = 100
     )
 
