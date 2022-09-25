@@ -54,3 +54,6 @@ hs_err_pid*
 
 # MNIST database
 MNIST/
+
+# jvm settings (only for testing right now)
+.jvmopts
