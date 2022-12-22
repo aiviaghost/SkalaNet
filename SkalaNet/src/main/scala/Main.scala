@@ -49,7 +49,7 @@ def saveNetwork() =
     ObjectOutputStream(bos).writeObject(nn)
     Files.write(
         Paths.get("../dump"),
-        Base64.getEncoder.encode(bos.toByteArray())
+        Base64.getEncoder.encode(ZipWrapper.compress(bos.toByteArray()))
     )
 
 def loadNetwork() = ???
