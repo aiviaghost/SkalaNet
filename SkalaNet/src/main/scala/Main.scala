@@ -1,5 +1,12 @@
 package SkalaNet
 
+import java.util.Base64
+import java.io.ObjectOutputStream
+import java.io.FileOutputStream
+import java.io.ByteArrayOutputStream
+import java.nio.file.{Paths, Files}
+import java.nio.charset.StandardCharsets
+
 lazy val trainingImages = Image.readImages(
     imageFile = "../MNIST/training_set/train-images-idx3-ubyte",
     labelFile = "../MNIST/training_set/train-labels-idx1-ubyte"
@@ -37,7 +44,13 @@ def trainNetwork() = nn.SGD(
     batchSize = 100
 )
 
-def saveNetwork() = ???
+def saveNetwork() =
+    val bos = ByteArrayOutputStream()
+    ObjectOutputStream(bos).writeObject(nn)
+    Files.write(
+        Paths.get("../dump"),
+        Base64.getEncoder.encode(bos.toByteArray())
+    )
 
 def loadNetwork() = ???
 

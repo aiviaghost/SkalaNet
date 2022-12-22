@@ -4,7 +4,9 @@ import collection.mutable.ArrayBuffer
 import Utils.*
 import util.Random.shuffle
 
-case class NeuralNetwork private (private val layerSizes: Seq[Int]):
+@SerialVersionUID(42L)
+case class NeuralNetwork private (private val layerSizes: Seq[Int])
+    extends Serializable:
     private val dimensions = layerSizes.tail.zip(layerSizes)
     private var weights = dimensions.map((n, m) => Matrix.fillRandom(n, m))
     private var biases = dimensions.map((n, _) => Matrix.fillRandom(n, 1))
