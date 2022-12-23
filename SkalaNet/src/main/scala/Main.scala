@@ -1,11 +1,16 @@
 package SkalaNet
 
 import java.util.Base64
-import java.io.ObjectOutputStream
-import java.io.FileOutputStream
-import java.io.ByteArrayOutputStream
 import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
+import java.io.{
+    FileInputStream,
+    FileOutputStream,
+    ObjectInputStream,
+    ObjectOutputStream,
+    ByteArrayInputStream,
+    ByteArrayOutputStream
+}
 
 lazy val trainingImages = Image.readImages(
     imageFile = "../MNIST/training_set/train-images-idx3-ubyte",
@@ -16,7 +21,7 @@ lazy val testImages = Image.readImages(
     labelFile = "../MNIST/test_set/t10k-labels-idx1-ubyte"
 )
 
-val nn = NeuralNetwork.ofDim(784, 16, 16, 10)
+var nn = NeuralNetwork.ofDim(784, 16, 16, 10)
 
 def scoreNetwork() =
     println("Scoring network accuracy ...")
@@ -45,14 +50,26 @@ def trainNetwork() = nn.SGD(
 )
 
 def saveNetwork() =
-    val bos = ByteArrayOutputStream()
-    ObjectOutputStream(bos).writeObject(nn)
+    val outputStream = ByteArrayOutputStream()
+    ObjectOutputStream(outputStream).writeObject(nn)
     Files.write(
         Paths.get("../dump"),
-        Base64.getEncoder.encode(ZipWrapper.compress(bos.toByteArray()))
+        Base64.getEncoder.encode(
+            CompressionUtility.compress(outputStream.toByteArray())
+        )
     )
 
-def loadNetwork() = ???
+def loadNetwork() =
+    val data =
+        CompressionUtility.decompress(
+            Base64.getDecoder.decode(
+                Files.readAllBytes(Paths.get("../dump"))
+            )
+        )
+
+    nn = ObjectInputStream(ByteArrayInputStream(data))
+        .readObject()
+        .asInstanceOf[NeuralNetwork]
 
 def help() = ???
 
