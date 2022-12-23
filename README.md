@@ -1,5 +1,8 @@
 # SkalaNet
-A simple neural network for classifying handwritten digits, implemented in Scala 3 with Scala Native. It is based on the excellent introductory series by 3b1b and a link to his playlist can be found in the links-section. 
+A simple neural network for classifying handwritten digits, implemented in Scala 3. It is based on the excellent introductory series by 3b1b and a link to his playlist can be found in the links-section. 
+
+# Scala Native
+This project was originally going to be implemented in Scala Native but for some reason the Native-compiler breaks the correctness of the code so I will be using plain Scala 3 for the time being. 
 
 # Links
 - Introductory playlist by 3b1b: https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi
