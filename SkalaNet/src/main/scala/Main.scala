@@ -11,6 +11,7 @@ import java.io.{
     ByteArrayInputStream,
     ByteArrayOutputStream
 }
+import scala.util.{Try, Success, Failure}
 
 lazy val trainingImages = Image.readImages(
     imageFile = "../MNIST/training_set/train-images-idx3-ubyte",
@@ -50,28 +51,49 @@ def trainNetwork() = nn.SGD(
 )
 
 def saveNetwork() =
+    val filename = io.StdIn.readLine("Filename: ")
     val outputStream = ByteArrayOutputStream()
     ObjectOutputStream(outputStream).writeObject(nn)
+
+    if !Files.exists(Paths.get("../Saved-networks")) then
+        Files.createDirectory(Paths.get("../Saved-networks"))
+
     Files.write(
-        Paths.get("../dump"),
+        Paths.get(s"../Saved-networks/${filename}"),
         Base64.getEncoder.encode(
             CompressionUtility.compress(outputStream.toByteArray())
         )
     )
 
 def loadNetwork() =
-    val data =
+    val filename = io.StdIn.readLine("Filename: ")
+
+    val data = Try {
         CompressionUtility.decompress(
             Base64.getDecoder.decode(
-                Files.readAllBytes(Paths.get("../dump"))
+                Files.readAllBytes(
+                    Paths.get(s"../Saved-networks/${filename}")
+                )
             )
         )
+    }
 
-    nn = ObjectInputStream(ByteArrayInputStream(data))
-        .readObject()
-        .asInstanceOf[NeuralNetwork]
+    data match
+        case Success(data) =>
+            val new_nn_t = Try {
+                ObjectInputStream(ByteArrayInputStream(data))
+                    .readObject()
+                    .asInstanceOf[NeuralNetwork]
+            }
 
-def help() = ???
+            new_nn_t match
+                case Success(new_nn) => nn = new_nn
+                case Failure(_) =>
+                    println(
+                        "Failed to create NeuralNetwork instance from selected file!"
+                    )
+
+        case Failure(_) => println("Reading selected file failed!")
 
 def quit() = System.exit(0)
 
@@ -81,7 +103,6 @@ val menuOptions = Seq(
     ("Train network", trainNetwork _),
     ("Save network", saveNetwork _),
     ("Load network", loadNetwork _),
-    ("Help", help _),
     ("Quit", quit _)
 )
 
