@@ -80,13 +80,13 @@ def loadNetwork() =
 
     data match
         case Success(data) =>
-            val new_nn_t = Try {
+            val new_nn = Try {
                 ObjectInputStream(ByteArrayInputStream(data))
                     .readObject()
                     .asInstanceOf[NeuralNetwork]
             }
 
-            new_nn_t match
+            new_nn match
                 case Success(new_nn) => nn = new_nn
                 case Failure(_) =>
                     println(
