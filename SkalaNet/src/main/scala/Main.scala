@@ -3,6 +3,7 @@ package SkalaNet
 import java.util.Base64
 import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
+import scala.util.{Try, Success, Failure}
 import java.io.{
     FileInputStream,
     FileOutputStream,
@@ -11,7 +12,6 @@ import java.io.{
     ByteArrayInputStream,
     ByteArrayOutputStream
 }
-import scala.util.{Try, Success, Failure}
 
 lazy val trainingImages = Image.readImages(
     imageFile = "../MNIST/training_set/train-images-idx3-ubyte",
