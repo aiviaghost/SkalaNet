@@ -33,6 +33,7 @@ extension (matrix: Matrix)
             cols == other.rows,
             s"Matrices with dimensions ${(rows, cols)} and ${(other.rows, other.cols)} can not be multiplied!"
         )
+
         val (n, m, p) = (rows, cols, other.cols)
         val T = 10
         val res = Array.ofDim[Float](n, p)
@@ -66,13 +67,13 @@ extension (matrix: Matrix)
 
 object Matrix:
 
-    def fromArray(matrix: Array[Array[Float]]): Matrix =
+    def fromArray(array: Array[Array[Float]]): Matrix =
         assert(
-            matrix.forall(_.size == matrix(0).size),
+            array.forall(_.size == array(0).size),
             "Not all rows are of equal length!"
         )
 
-        matrix
+        array
 
     def fillRandom(rows: Int, cols: Int): Matrix =
         Array.fill(rows)(Array.fill(cols)(nextGaussian().toFloat))
