@@ -15,7 +15,7 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int])
         Matrix.map(z => 1 / (1 + math.exp(-z).toFloat), m)
 
     private def sigmoidPrime(m: Matrix): Matrix =
-        sigmoid(m) ⊙ (Matrix.ones(m.rows, m.cols) - sigmoid(m))
+        sigmoid(m).hadamard((Matrix.ones(m.rows, m.cols) - sigmoid(m)))
 
     private def feedforward(inp: Matrix): Matrix =
         weights.zip(biases).foldLeft(inp) { case (x, (w, b)) =>
@@ -95,8 +95,9 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int])
         }
 
         val targetVector = Matrix.makeTargetVector(layerSizes.last, expectedAns)
-        var delta = costPrime(as.last, targetVector) ⊙ sigmoidPrime(zs.last)
-        deltaW.append(delta * as.init.last.transpose)
+        var delta =
+            costPrime(as.last, targetVector).hadamard(sigmoidPrime(zs.last))
+        deltaW.append(delta * as.init.last.T)
         deltaB.append(delta)
 
         for (wNext, z, aPrev) <- zip(
@@ -105,9 +106,9 @@ case class NeuralNetwork private (private val layerSizes: Seq[Int])
                 as.init.init
             ).reverse
         do
-            delta = (wNext.transpose * delta) ⊙ sigmoidPrime(z)
+            delta = (wNext.T * delta).hadamard(sigmoidPrime(z))
             deltaB.append(delta)
-            deltaW.append(delta * aPrev.transpose)
+            deltaW.append(delta * aPrev.T)
 
         (deltaW.reverse.toSeq, deltaB.reverse.toSeq)
 
